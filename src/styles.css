@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+    font-family: 'Cabin', Arial, sans-serif;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+    background-color: #0a090e;
+    color: rgb(211, 211, 211);
+}
+
+:root {
+    --background-color-light: #ffffff;
+    --background-color-dark: #0a090e;
+    --background-color-oled: #000000;
+
+    --text-color-light: #000000;
+    --text-color-dark: #ffffff;
+    --text-color-oled: #ffffff;
+
+    --primary-color: #d6a366;
+    --secondary-color: #856238;
+
+    --margin: 10px;
+}
+
+/* Style global pour la barre */
+::-webkit-scrollbar {
+    width: 6px;
+}
+  
+/* Style du curseur */
+::-webkit-scrollbar-thumb {
+    background-color: var(--secondary-color);
+    border-radius: 6px;
+}
+
+/* Style de la piste */
+::-webkit-scrollbar-track {
+    border-radius: 6px;
+}
+  

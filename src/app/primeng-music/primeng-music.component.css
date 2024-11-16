@@ -1,0 +1,13 @@
+img {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td {
+    padding: 0.25rem;
+    height: 50px;
+}
+
+.primeng-music-table {
+    margin: var(--margin);
+}

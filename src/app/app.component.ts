@@ -1,13 +1,26 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { WelcomeComponent } from './welcome/welcome.component';
+import { PrimengPlaylistComponent } from './primeng-playlist/primeng-playlist.component';
+import { PrimengMusicComponent } from './primeng-music/primeng-music.component';
+import { SpotifyService } from './spotify.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    WelcomeComponent, 
+    PrimengPlaylistComponent, 
+    PrimengMusicComponent
+  ],
 })
-export class AppComponent {
-  title = 'spotify';
+export class AppComponent  {  
+  constructor(private spotifyService: SpotifyService) {}
+
+  get isAuthenticated(): boolean {
+    return !!this.spotifyService.getAccessTokenValue();
+  }
 }

@@ -1,0 +1,16 @@
+<div class="primeng-music-table">
+    <p-table [value]="likedTracks">
+        <ng-template pTemplate="body" let-track>
+            <tr>
+                <td>
+                    <img [src]="track.albumImage" alt="Album Image" width="50px" height="50px" />
+                </td>
+                <td>{{ track.name }}</td>
+                <td>{{ track.artist }}</td>
+                <td>
+                    <audio controls [src]="track.previewUrl"></audio>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>    
+</div>
