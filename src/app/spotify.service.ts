@@ -8,28 +8,38 @@ import { Observable } from 'rxjs';
 export class SpotifyService {
   private clientId = '87bb22bf134444c3875899d2b9e20c7b';  // Remplacez par votre client ID
   private redirectUri = 'http://localhost:4200/callback'; // Remplacez par votre URL de callback
-  private localStorageAccesToken = 'spotifyAccessToken'; // Clé pour LocalStorage
+  private localStorageAccesToken = 'spotifyAccessToken';
+  private expirationAccessToken = 'spotifyTokenExpiration';
 
   constructor(private http: HttpClient) {}
 
   public getAccessToken(): string | null {
+    const expiration = localStorage.getItem(this.expirationAccessToken);
+    if (expiration && Date.now() > +expiration) {
+      console.log('Access token expired');
+      this.clearAccessToken(); // Supprime le token expiré
+      return null;
+    }
     return localStorage.getItem(this.localStorageAccesToken);
-  }
-
-  private saveAccessToken(accessToken: string): void {
-    localStorage.setItem(this.localStorageAccesToken, accessToken);
   }
 
   public clearAccessToken(): void {
     localStorage.removeItem(this.localStorageAccesToken);
+    localStorage.removeItem(this.expirationAccessToken);
   }
 
   public setAccessTokenFromRedirectUrl(url: string): void {
     const hashParams = new URLSearchParams(url.split('#')[1]);
+    console.log('Hash params:', hashParams);
     const accessToken = hashParams.get('access_token');
+    const expiresIn = hashParams.get('expires_in');
 
-    if (accessToken) {
-      this.saveAccessToken(accessToken); // Stocke le token
+    if (accessToken && expiresIn) {
+      localStorage.setItem(this.localStorageAccesToken, accessToken);
+      localStorage.setItem(
+        this.expirationAccessToken,
+        (Date.now() + parseInt(expiresIn) * 1000).toString() // Stocker la date d'expiration
+      );
     }
   }
 
