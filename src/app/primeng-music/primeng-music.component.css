@@ -8,15 +8,19 @@ img {
 }
 
 audio {
-    transform: scale(0.9);
-    transform-origin: center;
+    transform: scale(0.85);
 }
-
 
 audio::-webkit-media-controls-play-button,
 audio::-webkit-media-controls-panel {
   background-color: var(--primary-color);
   color: var(--primary-color);
+}
+
+.audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -26,22 +30,14 @@ audio::-webkit-media-controls-panel {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
+}
   
-  .custom-audio-player button {
+.custom-audio-player button {
     font-size: 14px;
     padding: 5px 10px;
-  }
-  
+}
 
 
-
-
-
-
-
-
-  
 
 
 .custom-checkbox {

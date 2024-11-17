@@ -16,7 +16,7 @@
                 </td>
                 <td>{{ track.name }}</td>
                 <td>{{ track.artist }}</td>
-                <td>
+                <td class="audio">
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
                 <td *ngFor="let playlist of selectedPlaylists" class="td-playlists">

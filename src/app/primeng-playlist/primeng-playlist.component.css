@@ -5,7 +5,10 @@ img {
 
 .primeng-playlist-table {
   margin: var(--margin);
-  overflow: hidden;
+}
+
+.primeng-playlist-table > p-table {
+  overflow-x: hidden;
 }
 
 .checkbox-wrapper-59 input[type="checkbox"] {
