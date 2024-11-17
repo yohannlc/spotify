@@ -20,7 +20,7 @@
                 <td>
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
-                <td *ngFor="let playlist of selectedPlaylists">
+                <td *ngFor="let playlist of selectedPlaylists" class="td-playlists">
                     <!-- <div class="checkbox-wrapper-59">
                       <label class="switch">
                         <input
@@ -31,7 +31,6 @@
                         <span class="slider"></span>
                       </label>
                     </div> -->
-
                     <label class="custom-checkbox">
                         <input
                           type="checkbox"

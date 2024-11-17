@@ -11,6 +11,14 @@ td {
     padding: 0.25rem;
 }
 
+th {
+    padding: 0px 3px;
+}
+
+.td-playlists {
+    min-width: 2rem;
+}
+
 :root {
     --background-color-light: #ffffff;
     --background-color-dark: #0a090e;
