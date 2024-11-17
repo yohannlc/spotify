@@ -7,6 +7,10 @@ body {
     color: rgb(211, 211, 211);
 }
 
+td {
+    padding: 0.25rem;
+}
+
 :root {
     --background-color-light: #ffffff;
     --background-color-dark: #0a090e;

@@ -1,6 +1,16 @@
 <div class="primeng-music-table">
     <p-table [value]="likedTracks">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Artist</th>
+                <th>Preview</th>
+                <th *ngFor="let playlist of selectedPlaylists">{{ playlist.name }}</th>
+            </tr>
+        </ng-template>
         <ng-template pTemplate="body" let-track>
+            
             <tr>
                 <td>
                     <img [src]="track.albumImage" alt="Album Image" width="50px" height="50px" />
@@ -10,6 +20,27 @@
                 <td>
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
+                <td *ngFor="let playlist of selectedPlaylists">
+                    <!-- <div class="checkbox-wrapper-59">
+                      <label class="switch">
+                        <input
+                          type="checkbox"
+                          [checked]="isSelected(track.id, playlist.id)"
+                          (change)="onTrackPlaylistSelectionChange(track.id, playlist.id, $event)"
+                        />
+                        <span class="slider"></span>
+                      </label>
+                    </div> -->
+
+                    <label class="custom-checkbox">
+                        <input
+                          type="checkbox"
+                          [checked]="isSelected(track.id, playlist.id)"
+                          (change)="onTrackPlaylistSelectionChange(track.id, playlist.id, $event)"
+                        />
+                        <span class="checkmark"></span>
+                    </label>
+                  </td>
             </tr>
         </ng-template>
     </p-table>    

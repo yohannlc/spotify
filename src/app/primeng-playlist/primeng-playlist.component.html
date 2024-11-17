@@ -1,7 +1,5 @@
 <div class="primeng-playlist-table">
-    <p-table
-    [value]="playlists"
-    >
+    <p-table [value]="playlists">
         <ng-template pTemplate="body" let-playlist>
             <tr>
             <td>
@@ -10,18 +8,15 @@
             <td>{{ playlist.name }}</td>
 
             <td>
-                <!-- <p-checkbox
-                    [binary]="true"
-                    [(ngModel)]="playlist.selected"
-                    (onChange)="onPlaylistSelectionChange()">
-                ></p-checkbox> -->
-
                 <div class="checkbox-wrapper-59">
                     <label class="switch">
-                      <input type="checkbox">
-                      <span class="slider"></span>
+                        <input 
+                          type="checkbox" 
+                          [(ngModel)]="playlist.selected" 
+                          (change)="onPlaylistSelectionChange()">
+                        <span class="slider"></span>
                     </label>
-                  </div>
+                </div>
             </td>
             </tr>
         </ng-template>

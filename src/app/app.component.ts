@@ -17,10 +17,16 @@ import { SpotifyService } from './spotify.service';
     PrimengMusicComponent
   ],
 })
-export class AppComponent  {  
+export class AppComponent  {
+  selectedPlaylists: any[] = []; // Stocke les playlists sélectionnées
+
   constructor(private spotifyService: SpotifyService) {}
 
   get isAuthenticated(): boolean {
     return !!this.spotifyService.getAccessTokenValue();
+  }
+
+  updateSelectedPlaylists(playlists: any[]): void {
+    this.selectedPlaylists = playlists; // Mise à jour des playlists sélectionnées
   }
 }

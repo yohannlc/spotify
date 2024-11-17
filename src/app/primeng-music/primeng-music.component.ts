@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../spotify.service';
 import { TableModule } from 'primeng/table';
 
@@ -13,6 +14,7 @@ interface Track {
 interface Playlist {
   id: string;
   name: string;
+  image: string;
 }
 
 @Component({
@@ -20,17 +22,22 @@ interface Playlist {
   templateUrl: './primeng-music.component.html',
   styleUrls: ['./primeng-music.component.css'],
   standalone: true,
-  imports: [TableModule],
+  imports: [TableModule, CommonModule],
 })
 export class PrimengMusicComponent implements OnInit {
   @Input() selectedPlaylists: Playlist[] = [];
   likedTracks: Track[] = [];
-  trackPlaylistSelections: { [trackId: string]: { [playlistId: string]: boolean } } = {};
+  trackPlaylistSelections: { [trackId: string]: { [playlistId: string]: boolean } } = {}; // Suivre l'état des cases à cocher
 
   constructor(private spotifyService: SpotifyService) {}
 
   ngOnInit() {
     this.loadLikedTracks();
+  }
+
+  ngOnChanges(): void {
+    console.log('Playlists sélectionnées mises à jour :', this.selectedPlaylists);
+    this.loadTracksForSelectedPlaylists();
   }
 
   loadLikedTracks() {
@@ -43,27 +50,23 @@ export class PrimengMusicComponent implements OnInit {
         songUrl: item.track.external_urls.spotify,
         previewUrl: item.track.preview_url,
       }));
-      console.log(this.likedTracks);  // Vérifiez la sortie dans la console
     });
   }
-  
 
-  // onMusicSelect(musicId: string, playlistId: string, event: CheckboxChangeEvent) {
-  //   const isChecked = event.checked;
-  //   if (isChecked) {
-  //     console.log(`Ajouter la musique ${musicId} à la playlist ${playlistId}`);
-  //   } else {
-  //     console.log(`Retirer la musique ${musicId} de la playlist ${playlistId}`);
-  //   }
+  loadTracksForSelectedPlaylists() {
+    // Implémenter une logique pour charger les morceaux des playlists sélectionnées
+  }
 
-  //   // Mettre à jour l'état de la case à cocher
-  //   if (!this.trackPlaylistSelections[musicId]) {
-  //     this.trackPlaylistSelections[musicId] = {};
-  //   }
-  //   this.trackPlaylistSelections[musicId][playlistId] = isChecked;
-  // }
+  // Retourne l'état de la case à cocher pour une musique et une playlist
+  isSelected(trackId: string, playlistId: string): boolean {
+    return this.trackPlaylistSelections[trackId]?.[playlistId] || false;
+  }
 
-  // isChecked(trackId: string, playlistId: string): boolean {
-  //   return this.trackPlaylistSelections[trackId]?.[playlistId] || false;
-  // }
+  onTrackPlaylistSelectionChange(trackId: string, playlistId: string, event: any) {
+    const isChecked = event.checked;
+    if (!this.trackPlaylistSelections[trackId]) {
+      this.trackPlaylistSelections[trackId] = {};
+    }
+    this.trackPlaylistSelections[trackId][playlistId] = isChecked;
+  }
 }

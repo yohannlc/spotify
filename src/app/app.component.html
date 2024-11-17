@@ -4,7 +4,10 @@
   
   <!-- Si l'utilisateur est authentifié, on affiche l'application principale -->
   <div *ngIf="isAuthenticated" class="content">
-    <app-primeng-playlist></app-primeng-playlist>
-    <app-primeng-music></app-primeng-music>
+    <!-- Playlist Component -->
+    <app-primeng-playlist (selectedPlaylistsChange)="updateSelectedPlaylists($event)"></app-primeng-playlist>
+    
+    <!-- Music Component -->
+    <app-primeng-music [selectedPlaylists]="selectedPlaylists"></app-primeng-music>
   </div>
 </div>

@@ -51,15 +51,10 @@ export class SpotifyService {
   }
 
   public getUserPlaylists(userId: string): Observable<any> {
-    return this.getAccessToken().pipe(
-      switchMap((tokenResponse: any) => {
-        this.accessToken = tokenResponse.access_token;
-        const headers = new HttpHeaders({
-          Authorization: `Bearer ${this.accessToken}`,
-        });
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.accessToken}`,
+      });
 
-        return this.http.get(`https://api.spotify.com/v1/users/${userId}/playlists`, { headers });
-      })
-    );
+      return this.http.get(`https://api.spotify.com/v1/users/${userId}/playlists`, { headers });
   }
 }
