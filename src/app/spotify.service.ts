@@ -1,34 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators'; // Ajoute cette ligne pour switchMap
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpotifyService {
   private clientId = '87bb22bf134444c3875899d2b9e20c7b';  // Remplacez par votre client ID
-  private clientSecret = '8b61147436e1495387343c16c1d4f10c';  // Remplacez par votre client Secret
   private accessToken = '';
 
   private redirectUri = 'http://localhost:4200/callback'; // Remplacez par votre URL de callback
 
   constructor(private http: HttpClient) {}
 
-  private getAccessToken(): Observable<any> {
-    const body = new URLSearchParams();
-    body.set('grant_type', 'client_credentials');
-    body.set('scope', 'playlist-read-private user-library-read'); // Ajouter scope pour accéder aux morceaux likés
-
-    const headers = new HttpHeaders({
-      Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
-
-    return this.http.post('https://accounts.spotify.com/api/token', body.toString(), { headers });
-  }
-
-  getAccessTokenValue(): string {
+  getAccessToken(): string {
     return this.accessToken;
   }
 

@@ -23,7 +23,7 @@ export class AppComponent  {
   constructor(private spotifyService: SpotifyService) {}
 
   get isAuthenticated(): boolean {
-    return !!this.spotifyService.getAccessTokenValue();
+    return !!this.spotifyService.getAccessToken();
   }
 
   updateSelectedPlaylists(playlists: any[]): void {
