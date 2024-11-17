@@ -1,10 +1,15 @@
+.primeng-music-table {
+    margin: var(--margin);
+    padding: 0;
+}
+
 img {
     border-radius: 4px;
     object-fit: cover;
 }
 
-.primeng-music-table {
-    margin: var(--margin);
+.td-name {
+    min-width: 3rem;
 }
 
 audio {
@@ -17,7 +22,7 @@ audio::-webkit-media-controls-panel {
   color: var(--primary-color);
 }
 
-.audio {
+.td-audio {
     display: flex;
     align-items: center;
     justify-content: center;

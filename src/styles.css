@@ -8,7 +8,7 @@ body {
 }
 
 td {
-    padding: 0.25rem;
+    padding: 0.2rem;
 }
 
 th {
@@ -43,6 +43,7 @@ audio {
 /* Style global pour la barre */
 ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
   
 /* Style du curseur */
