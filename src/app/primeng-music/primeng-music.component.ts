@@ -51,8 +51,40 @@ export class PrimengMusicComponent implements OnInit {
         songUrl: item.track.external_urls.spotify,
         previewUrl: item.track.preview_url,
       }));
+
+      this.updateTrackPlaylistSelections();
     });
   }
+
+  updateTrackPlaylistSelections() {
+    this.likedTracks.forEach(track => {
+      this.selectedPlaylists.forEach(playlist => {
+        // Vous pouvez ici vérifier si le morceau appartient à une playlist
+        // Par exemple, en utilisant un service qui récupère les morceaux d'une playlist
+        // ou simplement par une logique qui associe un morceau à une playlist
+        if (this.isTrackInPlaylist(track.id, playlist.id)) {
+          if (!this.trackPlaylistSelections[track.id]) {
+            this.trackPlaylistSelections[track.id] = {};
+          }
+          this.trackPlaylistSelections[track.id][playlist.id] = true;
+        } else {
+          if (!this.trackPlaylistSelections[track.id]) {
+            this.trackPlaylistSelections[track.id] = {};
+          }
+          this.trackPlaylistSelections[track.id][playlist.id] = false;
+        }
+      });
+    });
+  }
+
+    // Exemple de méthode pour vérifier si un morceau est dans une playlist
+    isTrackInPlaylist(trackId: string, playlistId: string): boolean {
+      // Vous devrez adapter cette logique pour vérifier si le morceau est réellement
+      // dans la playlist en question (peut-être via une API Spotify ou autre logique)
+      // Par exemple, vous pourriez utiliser une méthode qui vous donne la liste des morceaux
+      // d'une playlist donnée et faire une comparaison.
+      return Math.random() > 0.5; // À adapter avec une logique réelle
+    }
 
   loadTracksForSelectedPlaylists() {
     // Implémenter une logique pour charger les morceaux des playlists sélectionnées

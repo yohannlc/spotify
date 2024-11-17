@@ -24,8 +24,7 @@ export class PrimengPlaylistComponent implements OnInit {
   }
 
   loadPlaylists() {
-    const userId = 'yohannlc';
-    this.spotifyService.getUserPlaylists(userId).subscribe((data) => {
+    this.spotifyService.getUserPlaylists().subscribe((data) => {
       this.playlists = data.items.map((playlist: any) => ({
         id: playlist.id,
         name: playlist.name,

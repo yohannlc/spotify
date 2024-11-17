@@ -35,11 +35,11 @@ export class SpotifyService {
     return this.http.get('https://api.spotify.com/v1/me/tracks', { headers });
   }
 
-  public getUserPlaylists(userId: string): Observable<any> {
+  public getUserPlaylists(): Observable<any> {
       const headers = new HttpHeaders({
         Authorization: `Bearer ${this.accessToken}`,
       });
 
-      return this.http.get(`https://api.spotify.com/v1/users/${userId}/playlists`, { headers });
+      return this.http.get(`https://api.spotify.com/v1/me/playlists`, { headers });
   }
 }
