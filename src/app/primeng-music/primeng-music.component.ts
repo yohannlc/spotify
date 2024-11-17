@@ -77,14 +77,14 @@ export class PrimengMusicComponent implements OnInit {
     });
   }
 
-    // Exemple de méthode pour vérifier si un morceau est dans une playlist
-    isTrackInPlaylist(trackId: string, playlistId: string): boolean {
-      // Vous devrez adapter cette logique pour vérifier si le morceau est réellement
-      // dans la playlist en question (peut-être via une API Spotify ou autre logique)
-      // Par exemple, vous pourriez utiliser une méthode qui vous donne la liste des morceaux
-      // d'une playlist donnée et faire une comparaison.
-      return Math.random() > 0.5; // À adapter avec une logique réelle
-    }
+  // Exemple de méthode pour vérifier si un morceau est dans une playlist
+  isTrackInPlaylist(trackId: string, playlistId: string): boolean {
+    // Vous devrez adapter cette logique pour vérifier si le morceau est réellement
+    // dans la playlist en question (peut-être via une API Spotify ou autre logique)
+    // Par exemple, vous pourriez utiliser une méthode qui vous donne la liste des morceaux
+    // d'une playlist donnée et faire une comparaison.
+    return Math.random() > 0.5; // À adapter avec une logique réelle
+  }
 
   loadTracksForSelectedPlaylists() {
     // Implémenter une logique pour charger les morceaux des playlists sélectionnées

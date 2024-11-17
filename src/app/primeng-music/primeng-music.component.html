@@ -11,12 +11,12 @@
         </ng-template>
         <ng-template pTemplate="body" let-track>
             <tr>
-                <td>
+                <td class="td-albumImage">
                     <img [src]="track.albumImage" alt="Album Image" width="50px" height="50px" />
                 </td>
-                <td>{{ track.name }}</td>
-                <td>{{ track.artist }}</td>
-                <td class="audio">
+                <td class="td-name">{{ track.name }}</td>
+                <td class="td-artist">{{ track.artist }}</td>
+                <td class="td-audio">
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
                 <td *ngFor="let playlist of selectedPlaylists" class="td-playlists">
