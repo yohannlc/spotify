@@ -3,12 +3,6 @@ img {
   object-fit: cover;
 }
 
-/* :host ::ng-deep .p-datatable-tbody > tr > td {
-  padding: 0.25rem 0rem 0.25rem 0rem;
-  height: 50px;
-  width: 50px;
-} */
-
 .primeng-playlist-table {
   margin: var(--margin);
   overflow: hidden;

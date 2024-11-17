@@ -19,6 +19,12 @@ th {
     min-width: 2rem;
 }
 
+audio {
+    margin: 0;
+    padding: 0;
+    font-size: 1px;
+}
+
 :root {
     --background-color-light: #ffffff;
     --background-color-dark: #0a090e;

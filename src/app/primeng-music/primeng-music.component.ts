@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../spotify.service';
 import { TableModule } from 'primeng/table';
+import { CustomAudioComponent } from '../customaudio/customaudio.component';
 
 interface Track {
   id: string;
@@ -22,7 +23,7 @@ interface Playlist {
   templateUrl: './primeng-music.component.html',
   styleUrls: ['./primeng-music.component.css'],
   standalone: true,
-  imports: [TableModule, CommonModule],
+  imports: [TableModule, CommonModule, CustomAudioComponent],
 })
 export class PrimengMusicComponent implements OnInit {
   @Input() selectedPlaylists: Playlist[] = [];
