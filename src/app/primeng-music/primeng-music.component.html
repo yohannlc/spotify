@@ -20,14 +20,26 @@
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
                 <td *ngFor="let playlist of selectedPlaylists" class="td-playlists">
-                  <label class="custom-checkbox">
+
+                  <label class="container">
+                    <input
+                      type="checkbox"
+                      [checked]="isSelected(track.id, playlist.id)"
+                      (change)="onTrackPlaylistSelectionChange(track.id, playlist.id, $event)"
+                    >
+                    <div class="checkmark"></div>
+                  </label>
+
+
+                  
+                  <!-- <label class="custom-checkbox">
                       <input
                         type="checkbox"
                         [checked]="isSelected(track.id, playlist.id)"
                         (change)="onTrackPlaylistSelectionChange(track.id, playlist.id, $event)"
                       />
                       <span class="checkmark"></span>
-                  </label>
+                  </label> -->
                 </td>
             </tr>
         </ng-template>

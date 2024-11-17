@@ -36,6 +36,11 @@ audio {
 
     --primary-color: #d6a366;
     --secondary-color: #856238;
+    --secondary-color-rgb: 133, 98, 56; /* Conversion de #856238 en RGB */
+
+    --checkbox-primary-opacity: 0.56;
+    --checkbox-secondary-opacity: 0.38;
+    --checkbox-tertiary-opacity: 0.19;
 
     --margin: 10px;
 }
