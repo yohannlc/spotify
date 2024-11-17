@@ -27,6 +27,14 @@ export class SpotifyService {
     this.accessToken = hashParams.get('access_token') || '';
   }
 
+  public getUserPlaylists(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.accessToken}`,
+    });
+
+    return this.http.get(`https://api.spotify.com/v1/me/playlists`, { headers });
+}
+
   public getUserLikedTracks(): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.accessToken}`,
@@ -35,11 +43,11 @@ export class SpotifyService {
     return this.http.get('https://api.spotify.com/v1/me/tracks', { headers });
   }
 
-  public getUserPlaylists(): Observable<any> {
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${this.accessToken}`,
-      });
-
-      return this.http.get(`https://api.spotify.com/v1/me/playlists`, { headers });
+  public getPlaylistTracks(playlistId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.accessToken}`,
+    });
+    return this.http.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { headers });
   }
+  
 }
