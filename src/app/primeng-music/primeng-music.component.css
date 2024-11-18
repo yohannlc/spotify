@@ -12,6 +12,11 @@ img {
     min-width: 3rem;
 }
 
+th {
+ font-size: 0.8rem;
+ height: 1rem; 
+}
+
 audio {
     transform: scale(0.85);
 }
