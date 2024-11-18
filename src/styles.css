@@ -3,7 +3,7 @@ body {
     font-weight: 700;
     margin: 0;
     padding: 0;
-    background-color: #0a090e;
+    background-color: var(--background-color-dark);
     color: rgb(211, 211, 211);
 }
 
@@ -27,7 +27,7 @@ audio {
 
 :root {
     --background-color-light: #ffffff;
-    --background-color-dark: #0a090e;
+    --background-color-dark: #121212;
     --background-color-oled: #000000;
 
     --text-color-light: #000000;
@@ -40,7 +40,7 @@ audio {
 
     --checkbox-primary-opacity: 0.56;
     --checkbox-secondary-opacity: 0.38;
-    --checkbox-tertiary-opacity: 0.19;
+    --checkbox-tertiary-opacity: 0.09;
 
     --margin: 10px;
 }
