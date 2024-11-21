@@ -16,6 +16,7 @@ interface Playlist {
   id: string;
   name: string;
   image: string;
+  total: number;
 }
 
 @Component({
@@ -64,14 +65,16 @@ export class PrimengMusicComponent implements OnInit {
       // Restaurer les morceaux depuis localStorage
       this.playlistsTracks[playlist.id] = JSON.parse(storedTracks);
       // Console.log les noms des morceaux
-      console.log('Noms des morceaux de la playlist', playlist.id, ':', this.playlistsTracks[playlist.id].map((trackId: string) => this.likedTracks.find((track) => track.id === trackId)?.name));
+      console.log('Noms des morceaux de la playlist', playlist.name, ':', this.playlistsTracks[playlist.id].map((trackId: string) => this.likedTracks.find((track) => track.id === trackId)?.name));
     } else {
       // Charger depuis l'API si non sauvegardé
       this.spotifyService.getPlaylistTracks(playlist.id).subscribe((response: any) => {
         const tracks = response.items.map((item: any) => ({
           id: item.track.id,
         }));
-        console.log('Morceaux de la playlist', playlist.id, ':', tracks);
+        this.selectedPlaylists.find((p) => p.id === playlist.id)!.total = response.total;
+        console.log('Nombre total de morceaux dans la playlist', playlist.name, ':', response.total);
+        console.log('Morceaux de la playlist', playlist.name, ':', tracks);
         this.playlistsTracks[playlist.id] = tracks.map((track: any) => track.id);
         // Sauvegarder les morceaux dans localStorage
         localStorage.setItem(`playlistTracks_${playlist.id}`, JSON.stringify(this.playlistsTracks[playlist.id]));
