@@ -28,8 +28,7 @@ interface Playlist {
 export class PrimengMusicComponent implements OnInit {
   @Input() selectedPlaylists: Playlist[] = [];
   likedTracks: Track[] = [];
-  trackPlaylistSelections: { [trackId: string]: { [playlistId: string]: boolean } } = {}; // Suivre l'état des cases à cocher
-
+  playlistsTracks: { [playlistId: string]: string[] } = {};
   constructor(private spotifyService: SpotifyService) {}
 
   ngOnInit() {
@@ -38,9 +37,14 @@ export class PrimengMusicComponent implements OnInit {
 
   ngOnChanges(): void {
     console.log('Playlists sélectionnées mises à jour :', this.selectedPlaylists);
-    this.loadTracksForSelectedPlaylists();
+    // Charger les morceaux pour chaque playlist sélectionnée
+    this.selectedPlaylists.forEach((playlist) => {
+      if (!this.playlistsTracks[playlist.id]) {
+        this.loadPlaylistsTracks(playlist); // Charger uniquement si non déjà chargé
+      }
+    });
   }
-
+  
   loadLikedTracks() {
     this.spotifyService.getUserLikedTracks().subscribe((response: any) => {
       this.likedTracks = response.items.map((item: any) => ({
@@ -51,55 +55,44 @@ export class PrimengMusicComponent implements OnInit {
         songUrl: item.track.external_urls.spotify,
         previewUrl: item.track.preview_url,
       }));
-
-      this.updateTrackPlaylistSelections();
     });
   }
 
-  updateTrackPlaylistSelections() {
-    this.likedTracks.forEach(track => {
-      this.selectedPlaylists.forEach(playlist => {
-        // Vous pouvez ici vérifier si le morceau appartient à une playlist
-        // Par exemple, en utilisant un service qui récupère les morceaux d'une playlist
-        // ou simplement par une logique qui associe un morceau à une playlist
-        if (this.isTrackInPlaylist(track.id, playlist.id)) {
-          if (!this.trackPlaylistSelections[track.id]) {
-            this.trackPlaylistSelections[track.id] = {};
-          }
-          this.trackPlaylistSelections[track.id][playlist.id] = true;
-        } else {
-          if (!this.trackPlaylistSelections[track.id]) {
-            this.trackPlaylistSelections[track.id] = {};
-          }
-          this.trackPlaylistSelections[track.id][playlist.id] = false;
-        }
+  loadPlaylistsTracks(playlist: Playlist) {
+    const storedTracks = localStorage.getItem(`playlistTracks_${playlist.id}`);
+    if (storedTracks) {
+      // Restaurer les morceaux depuis localStorage
+      this.playlistsTracks[playlist.id] = JSON.parse(storedTracks);
+      // Console.log les noms des morceaux
+      console.log('Noms des morceaux de la playlist', playlist.id, ':', this.playlistsTracks[playlist.id].map((trackId: string) => this.likedTracks.find((track) => track.id === trackId)?.name));
+    } else {
+      // Charger depuis l'API si non sauvegardé
+      this.spotifyService.getPlaylistTracks(playlist.id).subscribe((response: any) => {
+        const tracks = response.items.map((item: any) => ({
+          id: item.track.id,
+        }));
+        console.log('Morceaux de la playlist', playlist.id, ':', tracks);
+        this.playlistsTracks[playlist.id] = tracks.map((track: any) => track.id);
+        // Sauvegarder les morceaux dans localStorage
+        localStorage.setItem(`playlistTracks_${playlist.id}`, JSON.stringify(this.playlistsTracks[playlist.id]));
       });
-    });
-  }
-
-  // Exemple de méthode pour vérifier si un morceau est dans une playlist
-  isTrackInPlaylist(trackId: string, playlistId: string): boolean {
-    // Vous devrez adapter cette logique pour vérifier si le morceau est réellement
-    // dans la playlist en question (peut-être via une API Spotify ou autre logique)
-    // Par exemple, vous pourriez utiliser une méthode qui vous donne la liste des morceaux
-    // d'une playlist donnée et faire une comparaison.
-    return Math.random() > 0.5; // À adapter avec une logique réelle
-  }
-
-  loadTracksForSelectedPlaylists() {
-    // Implémenter une logique pour charger les morceaux des playlists sélectionnées
-  }
-
-  // Retourne l'état de la case à cocher pour une musique et une playlist
-  isSelected(trackId: string, playlistId: string): boolean {
-    return this.trackPlaylistSelections[trackId]?.[playlistId] || false;
-  }
-
-  onTrackPlaylistSelectionChange(trackId: string, playlistId: string, event: any) {
-    const isChecked = event.checked;
-    if (!this.trackPlaylistSelections[trackId]) {
-      this.trackPlaylistSelections[trackId] = {};
     }
-    this.trackPlaylistSelections[trackId][playlistId] = isChecked;
+  }
+
+  isSelected(playlistId: string, trackId: string): boolean {
+    return this.playlistsTracks[playlistId]?.includes(trackId);
+  }
+
+  // onCheckboxChange($event, playlist.id, track.id)
+  onCheckboxChange(event: any, playlistId: string, trackId: string) {
+    if (event.target.checked) {
+      this.spotifyService.addTrackToPlaylist(playlistId, trackId).subscribe(() => {
+        console.log(`Piste ${trackId} ajoutée à la playlist ${playlistId}`);
+      });
+    } else {
+      this.spotifyService.removeTrackFromPlaylist(playlistId, trackId).subscribe(() => {
+        console.log(`Piste ${trackId} retirée de la playlist ${playlistId}`);
+      });
+    }
   }
 }

@@ -43,8 +43,13 @@ export class SpotifyService {
     }
   }
 
+  public regenerateAccessToken(): void {
+    this.clearAccessToken();
+    window.location.href = this.getAuthorizationUrl();
+  }
+
   public getAuthorizationUrl(): string {
-    const scopes = 'user-library-read playlist-read-private';
+    const scopes = 'user-library-read playlist-read-private playlist-modify-private playlist-modify-public';
     return `https://accounts.spotify.com/authorize?response_type=token&client_id=${this.clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(this.redirectUri)}`;
   }
 
@@ -69,6 +74,23 @@ export class SpotifyService {
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
     return this.http.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { headers });
+  }
+
+  addTrackToPlaylist(playlistId: string, trackId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.getAccessToken()}`,
+    });
+    return this.http.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { uris: [`spotify:track:${trackId}`] }, { headers });
+  }
+
+  removeTrackFromPlaylist(playlistId: string, trackId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.getAccessToken()}`,
+    });
+    return this.http.delete(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      headers,
+      body: { tracks: [{ uri: `spotify:track:${trackId}` }] },
+    });
   }
   
 }

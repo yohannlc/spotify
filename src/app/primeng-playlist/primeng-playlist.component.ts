@@ -21,6 +21,7 @@ export class PrimengPlaylistComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPlaylists();
+    this.restoreSelectedPlaylists();
   }
 
   loadPlaylists() {
@@ -34,9 +35,22 @@ export class PrimengPlaylistComponent implements OnInit {
     });
   }
 
-  // Méthode appelée lorsqu'une playlist est sélectionnée
+  restoreSelectedPlaylists() {
+    const storedPlaylists = localStorage.getItem('selectedPlaylists');
+    if (storedPlaylists) {
+      const selectedIds = JSON.parse(storedPlaylists);
+      this.playlists.forEach(playlist => {
+        playlist.selected = selectedIds.includes(playlist.id);
+      });
+      this.onPlaylistSelectionChange(); // Émettre l'état restauré
+    }
+  }
+  
   onPlaylistSelectionChange() {
     const selectedPlaylists = this.playlists.filter(playlist => playlist.selected);
     this.selectedPlaylistsChange.emit(selectedPlaylists);
+    // Sauvegarder les playlists sélectionnées
+    const selectedIds = selectedPlaylists.map(playlist => playlist.id);
+    localStorage.setItem('selectedPlaylists', JSON.stringify(selectedIds));
   }
 }

@@ -24,8 +24,8 @@
                   <label class="checkbox-container">
                     <input
                       type="checkbox"
-                      [checked]="isSelected(track.id, playlist.id)"
-                      (change)="onTrackPlaylistSelectionChange(track.id, playlist.id, $event)"
+                      [checked]="isSelected(playlist.id, track.id)"
+                      (change)="onCheckboxChange($event, playlist.id, track.id)"
                     >
                     <div class="checkmark"></div>
                   </label>

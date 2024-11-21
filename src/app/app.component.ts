@@ -29,4 +29,8 @@ export class AppComponent  {
   updateSelectedPlaylists(playlists: any[]): void {
     this.selectedPlaylists = playlists; // Mise à jour des playlists sélectionnées
   }
+
+  regenerateAccessToken(): void {
+    this.spotifyService.regenerateAccessToken();
+  }
 }
