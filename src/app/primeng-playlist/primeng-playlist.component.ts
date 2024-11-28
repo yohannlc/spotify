@@ -3,6 +3,8 @@ import { SpotifyService } from '../spotify.service'; // Assurez-vous que le chem
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
+import { map, catchError, filter } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-primeng-playlist',
@@ -25,15 +27,29 @@ export class PrimengPlaylistComponent implements OnInit {
   }
 
   loadPlaylists() {
-    this.spotifyService.getUserPlaylists().subscribe((data) => {
-      this.playlists = data.items.map((playlist: any) => ({
-        id: playlist.id,
-        name: playlist.name,
-        image: playlist.images[0]?.url || 'default-image-url',
-        selected: false,
-      }));
+    this.spotifyService.getUserPlaylists()
+    .pipe(
+      catchError((err) => {
+        console.error('Erreur lors de la récupération des playlists', err);
+        return of({ items: [] }); // Retourne une liste vide si l'API échoue
+      }),
+      map(response => response.items || []), // Assure que items est toujours une liste (data.items ou une liste vide)
+      filter((items: any[]) => Array.isArray(items)), // Vérifie que c'est une liste
+      map(items =>
+        items.filter((item: any) => item && item.id) // Conserve uniquement les items (playlists) non null et avec un ID
+          .map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            image: item.images[0]?.url || 'default-image-url',
+            selected: false,
+          }))
+      )
+    )
+    .subscribe((items) => {
+      this.playlists = items;
     });
   }
+  
 
   restoreSelectedPlaylists() {
     const storedPlaylists = localStorage.getItem('selectedPlaylists');
