@@ -3,8 +3,7 @@ import { SpotifyService } from '../spotify.service'; // Assurez-vous que le chem
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
-import { map, catchError, filter } from 'rxjs/operators';
-import { of } from 'rxjs';
+import {  map, catchError, filter, of } from 'rxjs';
 
 @Component({
   selector: 'app-primeng-playlist',
@@ -34,7 +33,7 @@ export class PrimengPlaylistComponent implements OnInit {
         return of({ items: [] }); // Retourne une liste vide si l'API échoue
       }),
       map(response => response.items || []), // Assure que items est toujours une liste (data.items ou une liste vide)
-      filter((items: any[]) => Array.isArray(items)), // Vérifie que c'est une liste
+      filter((items: any[]) => Array.isArray(items)), // Vérifie que `items` est bien un tableau
       map(items =>
         items.filter((item: any) => item && item.id) // Conserve uniquement les items (playlists) non null et avec un ID
           .map((item: any) => ({
