@@ -1,6 +1,11 @@
 .primeng-music-table {
-    margin: var(--margin);
-    padding: 0;
+    margin-left: var(--margin);
+    flex: 1;
+}
+
+.primeng-music-table p-table {
+    flex: 1;
+    height: 100%; /* Prend toute la hauteur disponible */
 }
 
 img {

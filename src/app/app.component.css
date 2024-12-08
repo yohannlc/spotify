@@ -14,5 +14,5 @@ app-primeng-playlist {
 app-primeng-music {
   flex: 1;
   height: 100%;
-  overflow-y: unset;
+  display: flex;
 }
