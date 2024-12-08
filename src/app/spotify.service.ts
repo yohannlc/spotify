@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environments';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpotifyService {
-  private clientId = '87bb22bf134444c3875899d2b9e20c7b';  // Remplacez par votre client ID
-  private redirectUri = 'http://localhost:4200/callback'; // Remplacez par votre URL de callback
+  private clientId = '87bb22bf134444c3875899d2b9e20c7b';
+  private redirectUri = environment.redirectUri;
   private localStorageAccesToken = 'spotifyAccessToken';
   private expirationAccessToken = 'spotifyTokenExpiration';
 
