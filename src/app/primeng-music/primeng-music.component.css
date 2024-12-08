@@ -8,8 +8,19 @@ img {
     object-fit: cover;
 }
 
+.td-albumImage {
+    width: 4rem;
+    padding-right: 10px;
+}
+
 .td-name {
-    min-width: 3rem;
+    width: 25%;
+    padding-right: 10px;
+}
+
+.td-artist {
+    width: 25%;
+    padding-right: 10px;
 }
 
 th {

@@ -65,8 +65,9 @@ export class SpotifyService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
-
-    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks', { headers });
+    // https://api.spotify.com/v1/me/tracks
+    // https://api.spotify.com/v1/playlists//tracks
+    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/playlists/7lmcXlXkKK9FzjaVdven1v/tracks', { headers });
   }
 
   public getPlaylistTracks(playlistId: string): Observable<any> {

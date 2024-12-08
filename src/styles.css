@@ -7,18 +7,6 @@ body {
     color: rgb(211, 211, 211);
 }
 
-td {
-    padding: 0.2rem;
-}
-
-th {
-    padding: 0px 3px;
-}
-
-.td-playlists {
-    min-width: 2rem;
-}
-
 audio {
     margin: 0;
     padding: 0;
