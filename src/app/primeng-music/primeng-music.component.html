@@ -1,5 +1,14 @@
 <div class="primeng-music-table">
-    <p-table [value]="likedTracks"> <!-- PrimeNG injecte chaque élément de la liste likedTracks dans le ng-template comme valeur de la variable track à l'aide de let-track. -->
+    <p-table 
+      [value]="likedTracks"
+      [scrollable]="true"
+      scrollHeight="800px"
+      [rows]="200"
+      [virtualScroll]="true" 
+      [virtualScrollItemSize]="60" 
+      [lazy]="true"
+      (onLazyLoad)="loadLikedTracks()"
+    > <!-- PrimeNG injecte chaque élément de la liste likedTracks dans le ng-template comme valeur de la variable track à l'aide de let-track. -->
         <ng-template pTemplate="header">
             <tr>
                 <th></th>

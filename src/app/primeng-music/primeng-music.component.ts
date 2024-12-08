@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../spotify.service';
 import { TableModule } from 'primeng/table';
 import { CustomAudioComponent } from '../customaudio/customaudio.component';
-import {  map, catchError, filter, of } from 'rxjs';
+import { map, catchError, filter, of } from 'rxjs';
 
 interface Track {
   id: string;
@@ -28,7 +28,14 @@ interface Playlist {
 })
 export class PrimengMusicComponent implements OnInit {
   @Input() selectedPlaylists: Playlist[] = [];
+
+  isLoading: boolean = false;
+  nextUrl: string | null = null;
+  total: number = 0;
+  loadedTracks: number = 0;
   likedTracks: Track[] = [];
+  maxTracks: number = 400;
+
   constructor(private spotifyService: SpotifyService) {}
 
   ngOnInit() {
@@ -42,17 +49,46 @@ export class PrimengMusicComponent implements OnInit {
   }
   
   loadLikedTracks() {
-    this.spotifyService.getUserLikedTracks().subscribe((response: any) => {
-      this.likedTracks = response.items.map((item: any) => ({
-        id: item.track.id,
-        name: item.track.name,
-        artist: item.track.artists[0].name,
-        albumImage: item.track.album.images[0]?.url,
-        songUrl: item.track.external_urls.spotify,
-        previewUrl: item.track.preview_url,
-      }));
-    });
+    if (this.isLoading || this.total > 0 && this.loadedTracks >= this.total || this.likedTracks.length >= this.maxTracks) {
+      return;
+    }
+  
+    this.isLoading = true;
+    
+    console.log('Next URL:', this.nextUrl); // Ajoute un console.log pour afficher l'URL suivante
+  
+    this.spotifyService.getUserLikedTracks(this.nextUrl)
+      .pipe(
+        catchError((err) => {
+          console.error('Erreur lors de la récupération des pistes aimées', err);
+          this.isLoading = false; // Réinitialise immédiatement en cas d'erreur
+          return of({ items: [], total: 0, next: null });
+        }),
+        map(response => {
+          console.log('Response:', response); // Ajoute un console.log de la response
+          return response;
+        }),
+        map(({ items, next, total }) => {
+          const likedTracks = items?.map((item: any) => ({
+            id: item.track.id,
+            name: item.track.name,
+            artist: item.track.artists[0].name,
+            albumImage: item.track.album.images[0].url,
+            songUrl: item.track.external_urls.spotify,
+            previewUrl: item.track.preview_url,
+          })) || [];
+          return { likedTracks, nextUrl: next, total: total }; // Retourne un objet structuré
+        })
+      )
+      .subscribe(({ likedTracks, nextUrl, total }) => {
+        this.isLoading = false;
+        this.nextUrl = nextUrl;
+        this.total = total;
+        this.loadedTracks += likedTracks.length;
+        this.likedTracks = [...this.likedTracks, ...likedTracks]; // Ajoute les nouvelles pistes
+      });
   }
+  
 
   loadPlaylistsTracks(playlist: Playlist) {
     // On reload PAS les tracks si la playlist a déjà été mise à jour ou si elle n'a pas été modifiée depuis ou si la dernière mise à jour date de moins de 10 secondes
@@ -69,7 +105,11 @@ export class PrimengMusicComponent implements OnInit {
           console.error(`Erreur lors de la récupération des pistes pour la playlist ${playlist.id}`, err);
           return of({ items: [], total: 0 }); // Retourne une réponse vide en cas d'erreur
         }),
-        map(response => response.items || []), // Garantit que `items` est une liste (vide par défaut)
+        map(response => {
+          playlist.total = response.total; // Capture le total directement depuis la réponse
+          console.log('Response:', response); // Ajoute un console.log de la response
+          return response.items || [];
+        }),
         filter((items: any[]) => Array.isArray(items)), // Vérifie que `items` est bien un tableau
         map(items =>
           items
@@ -91,7 +131,7 @@ export class PrimengMusicComponent implements OnInit {
     return this.selectedPlaylists.some((playlist) => playlist.id === playlistId && playlist.tracks?.some((track) => track.id === trackId)); // Vérifie si la piste est dans la playlist
   }
 
-  // onCheckboxChange($event, playlist.id, track.id)
+
   onCheckboxChange(event: any, playlistId: string, trackId: string) {
     const playlist = this.selectedPlaylists.find((playlist) => playlist.id === playlistId); // Changement, on met à jour la valeur lastChange de la playlist actuelle
     if (playlist) {

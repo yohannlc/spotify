@@ -33,7 +33,6 @@ export class PrimengPlaylistComponent implements OnInit {
         return of({ items: [] }); // Retourne une liste vide si l'API échoue
       }),
       map(response => response.items || []), // Assure que items est toujours une liste (data.items ou une liste vide)
-      filter((items: any[]) => Array.isArray(items)), // Vérifie que `items` est bien un tableau
       map(items =>
         items.filter((item: any) => item && item.id) // Conserve uniquement les items (playlists) non null et avec un ID
           .map((item: any) => ({

@@ -61,12 +61,12 @@ export class SpotifyService {
     return this.http.get(`https://api.spotify.com/v1/me/playlists`, { headers });
 }
 
-  public getUserLikedTracks(): Observable<any> {
+  public getUserLikedTracks(requestUrl: string | null): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
 
-    return this.http.get('https://api.spotify.com/v1/me/tracks', { headers });
+    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks', { headers });
   }
 
   public getPlaylistTracks(playlistId: string): Observable<any> {
