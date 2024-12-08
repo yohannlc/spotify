@@ -16,6 +16,7 @@ audio {
 :root {
     --background-color-light: #ffffff;
     --background-color-dark: #121212;
+    --background-color-dark-soft: #24242475;
     --background-color-oled: #000000;
 
     --text-color-light: #000000;
@@ -48,4 +49,9 @@ audio {
 /* Style de la piste */
 ::-webkit-scrollbar-track {
     border-radius: 6px;
+}
+
+tr:hover {
+    background-color: var(--background-color-dark-soft);
+    border-radius: 100px;
 }

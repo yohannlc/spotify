@@ -19,11 +19,13 @@ img {
 }
 
 .td-name {
+    min-width: 10rem;
     width: 25%;
     padding-right: 10px;
 }
 
 .td-artist {
+    min-width: 10rem;
     width: 25%;
     padding-right: 10px;
 }
@@ -80,7 +82,7 @@ audio::-webkit-media-controls-panel {
     display: flex;
     position: relative;
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     user-select: none;
     justify-content: center;
 }
