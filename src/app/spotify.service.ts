@@ -68,7 +68,7 @@ export class SpotifyService {
     });
     // https://api.spotify.com/v1/me/tracks
     // https://api.spotify.com/v1/playlists//tracks
-    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/playlists/7lmcXlXkKK9FzjaVdven1v/tracks', { headers });
+    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks', { headers });
   }
 
   public getPlaylistTracks(playlistId: string): Observable<any> {
