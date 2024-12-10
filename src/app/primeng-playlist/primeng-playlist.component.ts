@@ -16,7 +16,11 @@ import {  map, catchError, filter, of } from 'rxjs';
 export class PrimengPlaylistComponent implements OnInit {
   @Output() selectedPlaylistsChange = new EventEmitter<any[]>(); // Émetteur pour les playlists sélectionnées
 
+  isLoading: boolean = false;
+  nextUrl: string | null = null;
+  total: number = 0;
   playlists: any[] = [];
+  maxPlaylists: number = 200;
 
   constructor(private spotifyService: SpotifyService) {}
 
@@ -26,27 +30,43 @@ export class PrimengPlaylistComponent implements OnInit {
   }
 
   loadPlaylists() {
-    this.spotifyService.getUserPlaylists()
-    .pipe(
-      catchError((err) => {
-        console.error('Erreur lors de la récupération des playlists', err);
-        return of({ items: [] }); // Retourne une liste vide si l'API échoue
-      }),
-      map(response => response.items || []), // Assure que items est toujours une liste (data.items ou une liste vide)
-      map(items =>
-        items.filter((item: any) => item && item.id) // Conserve uniquement les items (playlists) non null et avec un ID
-          .map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            image: item.images[0]?.url || 'default-image-url',
-            selected: false,
-          }))
+    if (this.isLoading) {
+      return; 
+    }
+
+    this.isLoading = true;
+
+    this.spotifyService.getUserPlaylists(this.nextUrl)
+      .pipe(
+        catchError((err) => {
+          console.error('Erreur lors de la récupération des playlists', err);
+          return of({ items: [], next: null, total: 0 });
+        }), 
+        map(({ items, next, total }) => {
+          const playlists = items
+            ?.filter((item: any) => item) // Conserve uniquement les playlists non nulles
+            .map((item: any) => ({
+              id: item.id,
+              name: item.name,
+              image: item.images[0]?.url || 'default-image-url',
+              selected: false,
+            })) || [];
+          return { playlists, nextUrl: next, total };
+        })
       )
-    )
-    .subscribe((items) => {
-      this.playlists = items;
-    });
+      .subscribe(({ playlists, nextUrl, total }) => {
+        this.playlists = [...this.playlists, ...playlists];
+        this.total = total;
+        this.nextUrl = nextUrl;
+
+        this.isLoading = false;
+
+        if (nextUrl && this.playlists.length < this.maxPlaylists) {
+          this.loadPlaylists();
+        }
+      });
   }
+  
   
 
   restoreSelectedPlaylists() {

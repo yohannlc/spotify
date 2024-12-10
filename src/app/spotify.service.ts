@@ -54,12 +54,12 @@ export class SpotifyService {
     return `https://accounts.spotify.com/authorize?response_type=token&client_id=${this.clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(this.redirectUri)}`;
   }
 
-  public getUserPlaylists(): Observable<any> {
+  public getUserPlaylists(requestUrl: string | null): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
 
-    return this.http.get(`https://api.spotify.com/v1/me/playlists`, { headers });
+    return this.http.get(requestUrl ? requestUrl : `https://api.spotify.com/v1/me/playlists`, { headers });
 }
 
   public getUserLikedTracks(requestUrl: string | null): Observable<any> {
@@ -71,11 +71,11 @@ export class SpotifyService {
     return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks', { headers });
   }
 
-  public getPlaylistTracks(playlistId: string): Observable<any> {
+  public getPlaylistTracks(playlistId: string, requestUrl: string | null): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
-    return this.http.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { headers });
+    return this.http.get(requestUrl ? requestUrl : `https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { headers });
   }
 
   addTrackToPlaylist(playlistId: string, trackId: string): Observable<any> {

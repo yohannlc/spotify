@@ -14,8 +14,10 @@ interface Playlist {
   name: string;
   image: string;
   total: number;
+  loadedTracks: number;
   lastUpdate: Date;
   lastChange: Date;
+  nextUrl: string | null;
   tracks: Track[];
 }
 
@@ -55,21 +57,17 @@ export class PrimengMusicComponent implements OnInit {
   
     this.isLoading = true;
     
-    console.log('Next URL:', this.nextUrl); // Ajoute un console.log pour afficher l'URL suivante
-  
     this.spotifyService.getUserLikedTracks(this.nextUrl)
       .pipe(
         catchError((err) => {
           console.error('Erreur lors de la récupération des pistes aimées', err);
           this.isLoading = false; // Réinitialise immédiatement en cas d'erreur
-          return of({ items: [], total: 0, next: null });
-        }),
-        map(response => {
-          console.log('Response:', response); // Ajoute un console.log de la response
-          return response;
+          return of({ items: [], next: null, total: 0 });
         }),
         map(({ items, next, total }) => {
-          const likedTracks = items?.map((item: any) => ({
+          const likedTracks = items
+          ?.filter((item: any) => item) // Conserve uniquement les éléments non nuls
+          ?.map((item: any) => ({
             id: item.track.id,
             name: item.track.name,
             artist: item.track.artists[0].name,
@@ -77,52 +75,64 @@ export class PrimengMusicComponent implements OnInit {
             songUrl: item.track.external_urls.spotify,
             previewUrl: item.track.preview_url,
           })) || [];
-          return { likedTracks, nextUrl: next, total: total }; // Retourne un objet structuré
+          return { likedTracks, nextUrl: next, total }; // Retourne un objet structuré
         })
       )
       .subscribe(({ likedTracks, nextUrl, total }) => {
-        this.isLoading = false;
-        this.nextUrl = nextUrl;
-        this.total = total;
-        this.loadedTracks += likedTracks.length;
         this.likedTracks = [...this.likedTracks, ...likedTracks]; // Ajoute les nouvelles pistes
+        this.total = total;
+        this.loadedTracks = this.likedTracks.length;
+        this.nextUrl = nextUrl;
+        
+        this.isLoading = false;
       });
   }
   
 
   loadPlaylistsTracks(playlist: Playlist) {
-    // On reload PAS les tracks si la playlist a déjà été mise à jour ou si elle n'a pas été modifiée depuis ou si la dernière mise à jour date de moins de 10 secondes
-    // On relad la playlist au bout de 10 secondes dans tous les cas pour récupérer les éventuelles modifications apportées hors de l'application (sur l'app Spotify directement par exemple)
-    if (playlist.lastUpdate &&
-        (!playlist.lastChange || playlist.lastUpdate > playlist.lastChange) &&
-        (Date.now() - playlist.lastUpdate.getTime() <= 10000)) {
-      return;
+    // Pour ne pas recharger inutilement les pistes il faut que :
+    if (playlist.lastUpdate // la playlist ait déjà été mise à jour
+        && (!playlist.lastChange || playlist.lastChange < playlist.lastUpdate) // ET que la playlist n'ait pas été modifiée depuis
+        && (Date.now() - playlist.lastUpdate.getTime() <= 10000) // ET que la dernière mise à jour date de moins de 10 secondes
+        && this.isLoading // ET que le chargement soit déjà en cours
+        ) {
+        return;
     }
+
+    this.isLoading = true;
   
-    this.spotifyService.getPlaylistTracks(playlist.id)
+    this.spotifyService.getPlaylistTracks(playlist.id, playlist.nextUrl)
       .pipe(
         catchError((err) => {
           console.error(`Erreur lors de la récupération des pistes pour la playlist ${playlist.id}`, err);
-          return of({ items: [], total: 0 }); // Retourne une réponse vide en cas d'erreur
+          return of({ items: [], next: null, total: 0 });
         }),
-        map(response => {
-          playlist.total = response.total; // Capture le total directement depuis la réponse
-          console.log('Response:', response); // Ajoute un console.log de la response
-          return response.items || [];
-        }),
-        filter((items: any[]) => Array.isArray(items)), // Vérifie que `items` est bien un tableau
-        map(items =>
-          items
-            .filter(item => item?.track?.id) // Conserve uniquement les éléments valides avec un ID de piste
-            .map(item => ({
+        map(({ items, next, total }) => {
+          const playlistTracks = items
+            ?.filter((item: any) => item) // Conserve uniquement les éléments non nuls
+            .map((item: any) => ({
               id: item.track.id,
-            }))
-        )
+              name: item.track.name,
+              artist: item.track.artists[0]?.name,
+              albumImage: item.track.album.images[0]?.url,
+              songUrl: item.track.external_urls?.spotify,
+              previewUrl: item.track?.preview_url,
+            })) || [];
+          return { playlistTracks, nextUrl: next, total }; // Retourne un objet structuré
+        })
       )
-      .subscribe((tracks) => {
+      .subscribe(({ playlistTracks, nextUrl, total }) => {
+        playlist.tracks = [...(playlist.tracks || []), ...playlistTracks];
+        playlist.total = total;
+        playlist.loadedTracks = playlist.tracks.length;
+        playlist.nextUrl = nextUrl;
+
+        this.isLoading = false;
         playlist.lastUpdate = new Date();
-        playlist.total = tracks.length;
-        playlist.tracks = tracks;
+
+        if (nextUrl) {
+          this.loadPlaylistsTracks(playlist);
+        }
       });
   }
   
