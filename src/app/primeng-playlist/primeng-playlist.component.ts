@@ -31,7 +31,7 @@ export class PrimengPlaylistComponent implements OnInit {
 
   loadPlaylists() {
     if (this.isLoading) {
-      return; 
+      return;
     }
 
     this.isLoading = true;
@@ -41,14 +41,18 @@ export class PrimengPlaylistComponent implements OnInit {
         catchError((err) => {
           console.error('Erreur lors de la récupération des playlists', err);
           return of({ items: [], next: null, total: 0 });
-        }), 
+        }),
+        // map(response => {
+        //   console.log('Response:', response); // Ajoute un console.log de la response
+        //   return response;
+        // }),
         map(({ items, next, total }) => {
           const playlists = items
             ?.filter((item: any) => item) // Conserve uniquement les playlists non nulles
             .map((item: any) => ({
               id: item.id,
               name: item.name,
-              image: item.images[0]?.url || 'default-image-url',
+              image: item.images?.[0]?.url || 'default-image-url',
               selected: false,
             })) || [];
           return { playlists, nextUrl: next, total };
