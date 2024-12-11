@@ -11,6 +11,10 @@ img {
   overflow-x: hidden;
 }
 
+.td-checkbox {
+  padding-right: 2px;
+}
+
 .checkbox-wrapper-59 input[type="checkbox"] {
   visibility: hidden;
   display: none;

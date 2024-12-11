@@ -2,21 +2,21 @@
     <p-table [value]="playlists">
         <ng-template pTemplate="body" let-playlist>
             <tr>
-            <td>
-                <img [src]="playlist.image" alt="Image de la playlist" width="50px" height="50px" />
-            </td>
-            <td>{{ playlist.name }}</td>
-            <td>
-                <div class="checkbox-wrapper-59">
-                    <label class="switch">
-                        <input 
-                          type="checkbox" 
-                          [(ngModel)]="playlist.selected" 
-                          (change)="onPlaylistSelectionChange()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </td>
+                <td class="td-image">
+                    <img [src]="playlist.image" alt="Image de la playlist" width="50px" height="50px" />
+                </td>
+                <td class="td-name">{{ playlist.name }}</td>
+                <td class="td-checkbox">
+                    <div class="checkbox-wrapper-59">
+                        <label class="switch">
+                            <input 
+                            type="checkbox" 
+                            [(ngModel)]="playlist.selected" 
+                            (change)="onPlaylistSelectionChange()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </td>
             </tr>
         </ng-template>
     </p-table>
