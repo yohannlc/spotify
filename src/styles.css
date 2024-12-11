@@ -53,5 +53,5 @@ audio {
 
 tr:hover {
     background-color: var(--background-color-dark-soft);
-    border-radius: 100px;
+    border-radius: 5px;
 }

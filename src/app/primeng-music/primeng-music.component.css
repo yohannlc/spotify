@@ -13,8 +13,13 @@ img {
     object-fit: cover;
 }
 
+th {
+    font-size: 0.8rem;
+    height: 1rem; 
+}
+
 .td-albumImage {
-    width: 4rem;
+    width: 50px;
     padding-right: 10px;
 }
 
@@ -28,11 +33,6 @@ img {
     min-width: 10rem;
     width: 25%;
     padding-right: 10px;
-}
-
-th {
- font-size: 0.8rem;
- height: 1rem; 
 }
 
 audio {

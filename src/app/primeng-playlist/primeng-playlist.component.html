@@ -1,11 +1,13 @@
 <div class="primeng-playlist-table">
     <p-table [value]="playlists">
         <ng-template pTemplate="body" let-playlist>
-            <tr>
+            <tr class="tr-content">
                 <td class="td-image">
                     <img [src]="playlist.image" alt="Image de la playlist" width="50px" height="50px" />
                 </td>
-                <td class="td-name">{{ playlist.name }}</td>
+                <td class="td-name">
+                    {{ playlist.name }}
+                </td>
                 <td class="td-checkbox">
                     <div class="checkbox-wrapper-59">
                         <label class="switch">
@@ -17,7 +19,7 @@
                         </label>
                     </div>
                 </td>
-            </tr>
+            </tr>            
         </ng-template>
     </p-table>
 </div>

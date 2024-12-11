@@ -1,19 +1,45 @@
-img {
-  border-radius: 4px;
-  object-fit: cover;
+* {
+  box-sizing: border-box;
 }
 
 .primeng-playlist-table {
   margin: var(--margin);
 }
 
-.primeng-playlist-table > p-table {
-  overflow-x: hidden;
+img {
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.tr-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3%;
+  width: 97%;
+  overflow-x: hidden; /* Empêche les débordements horizontaux */
+}
+
+.td-image {
+  display: flex;
+  align-items: center;
+}
+
+.td-name {
+  flex: 1;
+  text-align: left;
+  overflow: auto;
+  scrollbar-width: none; /* cacher la scrollbar */
 }
 
 .td-checkbox {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   padding-right: 2px;
 }
+
+
 
 .checkbox-wrapper-59 input[type="checkbox"] {
   visibility: hidden;
