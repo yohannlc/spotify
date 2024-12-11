@@ -16,6 +16,8 @@ import {  map, catchError, filter, of } from 'rxjs';
 export class PrimengPlaylistComponent implements OnInit {
   @Output() selectedPlaylistsChange = new EventEmitter<any[]>(); // Émetteur pour les playlists sélectionnées
 
+  userId: string = '';
+
   isLoading: boolean = false;
   nextUrl: string | null = null;
   total: number = 0;
@@ -27,6 +29,23 @@ export class PrimengPlaylistComponent implements OnInit {
   ngOnInit(): void {
     this.loadPlaylists();
     this.restoreSelectedPlaylists();
+    this.getUserId();
+  }
+
+  getUserId() {
+    this.spotifyService.getUserProfile()
+      .pipe(
+        catchError((err) => {
+          console.error('Erreur lors de la récupération du profil utilisateur', err);
+          return of({ id: '' });
+        }),
+        map(({ id }) => {
+          return id;
+        })
+      )
+      .subscribe((id) => {
+        this.userId = id;
+      });
   }
 
   loadPlaylists() {
@@ -49,6 +68,8 @@ export class PrimengPlaylistComponent implements OnInit {
         map(({ items, next, total }) => {
           const playlists = items
             ?.filter((item: any) => item) // Conserve uniquement les playlists non nulles
+            ?.filter((item: any) => item.owner.id === this.userId) // Conserve uniquement les playlists de l'utilisateur actuel
+            ?.filter((item: any) => item.images?.length > 0) // Conserve uniquement les playlists avec au moins une image
             .map((item: any) => ({
               id: item.id,
               name: item.name,

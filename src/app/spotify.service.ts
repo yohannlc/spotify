@@ -11,6 +11,7 @@ export class SpotifyService {
   private redirectUri = environment.redirectUri;
   private localStorageAccesToken = 'spotifyAccessToken';
   private expirationAccessToken = 'spotifyTokenExpiration';
+  private userId = '';
 
   constructor(private http: HttpClient) {}
 
@@ -52,6 +53,14 @@ export class SpotifyService {
   public getAuthorizationUrl(): string {
     const scopes = 'user-library-read playlist-read-private playlist-modify-private playlist-modify-public';
     return `https://accounts.spotify.com/authorize?response_type=token&client_id=${this.clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(this.redirectUri)}`;
+  }
+
+  public getUserProfile(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.getAccessToken()}`,
+    });
+  
+    return this.http.get('https://api.spotify.com/v1/me', { headers });
   }
 
   public getUserPlaylists(requestUrl: string | null): Observable<any> {
