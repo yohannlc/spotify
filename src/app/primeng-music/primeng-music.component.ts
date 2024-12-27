@@ -36,7 +36,7 @@ export class PrimengMusicComponent implements OnInit {
   total: number = 0;
   loadedTracks: number = 0;
   likedTracks: Track[] = [];
-  maxTracks: number = 400;
+  maxTracks: number = 1500;
 
   constructor(private spotifyService: SpotifyService) {}
 
