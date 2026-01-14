@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../spotify.service';
 import { TableModule } from 'primeng/table';
 import { CustomAudioComponent } from '../customaudio/customaudio.component';
-import { map, catchError, of } from 'rxjs';
+import { map, catchError, of, Subject, debounceTime } from 'rxjs';
 
 interface Track {
   id: string;
@@ -50,8 +50,26 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
   private spotifyService = inject(SpotifyService);
   private destroyRef = inject(DestroyRef);
 
-  // Signal calculé automatiquement
+  trackByPlaylistId(index: number, playlist: Playlist): string {
+    return playlist.id;
+  }
+  
+  trackByTrackId(index: number, track: Track): string {
+    return track.id;
+  }
+  
   loadedTracksCount = computed(() => this.likedTracks().length);
+
+  private scrollLoadSubject = new Subject<void>();
+
+  constructor() {
+    this.scrollLoadSubject.pipe(
+      debounceTime(200), // Attend 200ms de silence avant d'exécuter
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.executeActualLoad(); // Appelle la logique de chargement
+    });
+  }
 
   ngOnInit() {
     this.loadLikedTracks();
@@ -64,9 +82,15 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
       });
     }
   }
+  
+  // --- DÉCLENCHEUR DE CHARGEMENT ---
+  loadLikedTracks() {
+    this.scrollLoadSubject.next();
+  }
 
   // --- CHARGEMENT DES TITRES LIKÉS ---
-  loadLikedTracks() {
+  private executeActualLoad() {
+    // On vérifie les conditions de garde
     if (this.isLoading() || (this.total() > 0 && this.loadedTracksCount() >= this.total()) || this.likedTracks().length >= this.maxTracks) {
       return;
     }
@@ -77,18 +101,18 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
-          console.error('Erreur lors de la récupération des pistes aimées', err);
+          console.error('Erreur', err);
           this.isLoading.set(false);
           return of({ items: [], nextUrl: null, total: 0 });
         }),
         map(({ items, nextUrl, total }) => {
           const processedTracks = items?.filter((item: any) => item?.track).map((item: any) => ({
-            id: item.track.id,
-            name: item.track.name,
-            artist: item.track.artists?.[0]?.name || 'Unknown Artist',
-            albumImage: item.track.album?.images?.[0]?.url || '',
-            songUrl: item.track.external_urls?.spotify || '',
-            previewUrl: item.track.preview_url || '',
+             id: item.track.id,
+             name: item.track.name,
+             artist: item.track.artists?.[0]?.name || 'Unknown',
+             albumImage: item.track.album?.images?.[0]?.url || '',
+             songUrl: item.track.external_urls?.spotify || '',
+             previewUrl: item.track.preview_url || '',
           })) || [];
           return { processedTracks, nextUrl, total };
         })

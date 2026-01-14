@@ -1,13 +1,18 @@
 <div class="primeng-music-table">
     <p-table 
-      [value]="likedTracks()"
-      [scrollable]="true"
-      scrollHeight="flex"
-      [rows]="200"
-      [virtualScroll]="true" 
-      [virtualScrollItemSize]="60" 
-      [lazy]="true"
-      (onLazyLoad)="loadLikedTracks()"
+        [value]="likedTracks()"
+        [scrollable]="true" 
+        scrollHeight="flex"
+        [rows]="100"
+        [virtualScroll]="true" 
+        [virtualScrollItemSize]="60"
+        [virtualScrollOptions]="{ 
+            numToleratedItems: 10,
+            delay: 0,
+            showLoader: true 
+        }"
+        [lazy]="true"
+        (onLazyLoad)="loadLikedTracks()"
     > <!-- PrimeNG injecte chaque élément de la liste likedTracks dans le ng-template comme valeur de la variable track à l'aide de let-track. -->
         <ng-template pTemplate="header">
             <tr>
@@ -15,7 +20,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th *ngFor="let playlist of selectedPlaylists">{{ playlist.name }}</th>
+                <th *ngFor="let playlist of selectedPlaylists; trackBy: trackByPlaylistId">{{ playlist.name }}</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-track>
@@ -28,7 +33,7 @@
                 <td class="td-audio">
                     <audio controls [src]="track.previewUrl"></audio>
                 </td>
-                <td *ngFor="let playlist of selectedPlaylists" class="td-playlists">
+                <td *ngFor="let playlist of selectedPlaylists; trackBy: trackByPlaylistId" class="td-playlists">
 
                   <label class="checkbox-container">
                     <input
