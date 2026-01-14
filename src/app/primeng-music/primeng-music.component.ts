@@ -66,16 +66,17 @@ export class PrimengMusicComponent implements OnInit {
         }),
         map(({ items, next, total }) => {
           const likedTracks = items
-          ?.filter((item: any) => item) // Conserve uniquement les éléments non nuls
-          ?.map((item: any) => ({
-            id: item.track.id,
-            name: item.track.name,
-            artist: item.track.artists[0].name,
-            albumImage: item.track.album.images[0].url,
-            songUrl: item.track.external_urls.spotify,
-            previewUrl: item.track.preview_url,
-          })) || [];
-          return { likedTracks, nextUrl: next, total }; // Retourne un objet structuré
+            ?.filter((item: any) => item?.track) // Conserve uniquement les tracks non nuls
+            ?.map((item: any) => ({
+              id: item.track.id,
+              name: item.track.name,
+              artist: item.track.artists?.[0]?.name || 'Unknown Artist',
+              albumImage: item.track.album?.images?.[0]?.url || '',
+              songUrl: item.track.external_urls?.spotify || '',
+              previewUrl: item.track.preview_url || '',
+            })) || [];
+
+          return { likedTracks, nextUrl: next, total };
         })
       )
       .subscribe(({ likedTracks, nextUrl, total }) => {
