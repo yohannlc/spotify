@@ -8,6 +8,7 @@
     height: 100%; /* Prend toute la hauteur disponible */
 }
 
+
 img {
     border-radius: 4px;
     object-fit: cover;
@@ -15,26 +16,56 @@ img {
 
 th {
     font-size: 0.8rem;
-    height: 1rem; 
+    height: 1rem;
 }
 
+/* Toutes les lignes de la table */
+.primeng-music-table ::ng-deep .p-datatable-tbody > tr > td {
+    height: 60px !important;
+    max-height: 60px !important;
+    padding: 0 10px !important; /* Padding horizontal uniforme */
+    box-sizing: border-box;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+/* Album Image */
 .td-albumImage {
-    width: 50px;
-    padding-right: 10px;
+    /* Si l'image fait 40px + 10px de padding, width doit être au moins 50px */
+    width: 60px !important; 
+    min-width: 60px !important;
+    display: table-cell !important; /* Crucial : on ne met pas le TD en flex */
+    text-align: center;
 }
 
+.td-albumImage img {
+    display: inline-block; /* On revient à un affichage classique */
+    vertical-align: middle;
+    height: 50px; /* Taille fixe pour garantir que ça rentre dans les 60px du TD */
+    width: 50px;
+    border-radius: 4px;
+    content-visibility: auto; /* Évite que la cellule ne change de taille quand l'image arrive */
+    background-color: #282828; /* Couleur de fond en attendant l'image */}
+
+/* Track name */
 .td-name {
     min-width: 10rem;
     width: 25%;
-    padding-right: 10px;
 }
 
+/* Artist name */
 .td-artist {
     min-width: 10rem;
     width: 25%;
-    padding-right: 10px;
 }
 
+/* Centrage vertical pour le nom et l'artiste */
+.td-name, .td-artist {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* Audio player */
 audio {
     transform: scale(0.85);
 }
@@ -51,24 +82,19 @@ audio::-webkit-media-controls-panel {
     justify-content: center;
 }
 
-
-
 .custom-audio-player {
     font-size: 16px; /* Taille personnalisée du texte */
     display: flex;
     align-items: center;
     gap: 10px;
 }
-  
+ 
 .custom-audio-player button {
     font-size: 14px;
     padding: 5px 10px;
 }
 
-
-
-
-/* From Uiverse.io by bociKond */ 
+/* From Uiverse.io by bociKond */
 /* Hide the default checkbox */
 .checkbox-container input {
     position: absolute;
@@ -77,7 +103,7 @@ audio::-webkit-media-controls-panel {
     height: 0;
     width: 0;
 }
-  
+ 
 .checkbox-container {
     display: flex;
     position: relative;
