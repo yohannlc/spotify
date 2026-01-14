@@ -15,10 +15,10 @@ export class SpotifyService {
 
   constructor(private http: HttpClient) {}
 
+  // 1️⃣ Vérifier si token valide
   public getAccessToken(): string | null {
     const expiration = localStorage.getItem(this.expirationAccessToken);
     if (expiration && Date.now() > +expiration) {
-      console.log('Access token expired');
       this.clearAccessToken(); // Supprime le token expiré
       return null;
     }
@@ -30,31 +30,82 @@ export class SpotifyService {
     localStorage.removeItem(this.expirationAccessToken);
   }
 
-  public setAccessTokenFromRedirectUrl(url: string): void {
-    const hashParams = new URLSearchParams(url.split('#')[1]);
-    console.log('Hash params:', hashParams);
-    const accessToken = hashParams.get('access_token');
-    const expiresIn = hashParams.get('expires_in');
+  // 2️⃣ Récupérer le code de l’URL
+  public getAuthorizationCodeFromUrl(): string | null {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code');
+  }
 
-    if (accessToken && expiresIn) {
-      localStorage.setItem(this.localStorageAccesToken, accessToken);
-      localStorage.setItem(
-        this.expirationAccessToken,
-        (Date.now() + parseInt(expiresIn) * 1000).toString() // Stocker la date d'expiration
-      );
+  // 3️⃣ Traiter le code reçu
+  async handleAuthorizationCode(code: string) {
+    const verifier = localStorage.getItem('pkce_verifier');
+    if (!verifier) {
+      throw new Error('Missing PKCE verifier');
     }
+
+    this.exchangeCodeForToken(code, verifier).subscribe(res => {
+      localStorage.setItem('spotifyAccessToken', res.access_token);
+      localStorage.setItem(
+        'spotifyTokenExpiration',
+        (Date.now() + res.expires_in * 1000).toString()
+      );
+    });
   }
 
-  public regenerateAccessToken(): void {
-    this.clearAccessToken();
-    window.location.href = this.getAuthorizationUrl();
+  // 4️⃣ Échanger le code contre un token
+  public exchangeCodeForToken(code: string, codeVerifier: string): Observable<any> {
+    const body = new URLSearchParams({
+      client_id: this.clientId,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: this.redirectUri,
+      code_verifier: codeVerifier
+    });
+
+    return this.http.post(
+      'https://accounts.spotify.com/api/token',
+      body.toString(),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }
+    );
   }
 
-  public getAuthorizationUrl(): string {
+  // 5️⃣ Démarrer le login Spotify
+  async startLogin() {
+    const challenge = await this.generatePKCE();
+    window.location.href = this.getAuthorizationUrl(challenge);
+  }
+
+  // 6️⃣ Générer PKCE (avant login)
+  async generatePKCE() {
+    const verifier = crypto.randomUUID() + crypto.randomUUID();
+    localStorage.setItem('pkce_verifier', verifier);
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  }
+
+  // 7️⃣ Construire URL Spotify
+  public getAuthorizationUrl(codeChallenge: string): string {
     const scopes = 'user-library-read playlist-read-private playlist-modify-private playlist-modify-public';
-    return `https://accounts.spotify.com/authorize?response_type=token&client_id=${this.clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(this.redirectUri)}`;
+
+    return `https://accounts.spotify.com/authorize?` +
+      `client_id=${this.clientId}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(this.redirectUri)}` +
+      `&scope=${encodeURIComponent(scopes)}` +
+      `&code_challenge=${codeChallenge}` +
+      `&code_challenge_method=S256`;
   }
 
+  // 8️⃣ Méthodes API Spotify...
   public getUserProfile(): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,

@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    redirectUri: 'http://localhost:4200/callback',
+    redirectUri: 'http://127.0.0.1:8888/callback',
 };

@@ -4,33 +4,27 @@ import { SpotifyService } from '../spotify.service';
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css'
 })
-
 export class WelcomeComponent implements OnInit {
+
   constructor(private spotifyService: SpotifyService) {}
 
-  ngOnInit(): void {
-    const currentUrl = window.location.href;
-
-    // Vérifier si le token est déjà dans LocalStorage
+  async ngOnInit(): Promise<void> {
+    // 1️⃣ Si déjà connecté → ne rien faire
     const token = this.spotifyService.getAccessToken();
-    if (token) {
-      console.log('Access token found in local storage:', token);
-      return; // Évite de rediriger l'utilisateur inutilement
-    }
+    if (token) return;
 
-    // Si le token est dans l'URL, on le stocke
-    if (currentUrl.includes('access_token')) {
-      this.spotifyService.setAccessTokenFromRedirectUrl(currentUrl);
-
-      // Nettoyer l'URL après avoir extrait le token
+    // 2️⃣ Si retour Spotify avec ?code=
+    const code = this.spotifyService.getAuthorizationCodeFromUrl();
+    if (code) {
+      await this.spotifyService.handleAuthorizationCode(code);
       window.history.replaceState({}, document.title, '/');
-    } else {
-      // Sinon, rediriger vers Spotify pour l'autorisation
-      window.location.href = this.spotifyService.getAuthorizationUrl();
+      return;
     }
+
+     // 3️⃣ Sinon → rediriger vers Spotify
+    await this.spotifyService.startLogin();
   }
 }
