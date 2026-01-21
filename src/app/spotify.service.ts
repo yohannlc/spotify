@@ -128,14 +128,14 @@ export class SpotifyService {
     });
     // https://api.spotify.com/v1/me/tracks
     // https://api.spotify.com/v1/playlists//tracks
-    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks', { headers });
+    return this.http.get(requestUrl ? requestUrl : 'https://api.spotify.com/v1/me/tracks?limit=50', { headers });
   }
 
   public getPlaylistTracks(playlistId: string, requestUrl: string | null): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`,
     });
-    return this.http.get(requestUrl ? requestUrl : `https://api.spotify.com/v1/playlists/${playlistId}/tracks`, { headers });
+    return this.http.get(requestUrl ? requestUrl : `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`, { headers });
   }
 
   addTrackToPlaylist(playlistId: string, trackId: string): Observable<any> {
