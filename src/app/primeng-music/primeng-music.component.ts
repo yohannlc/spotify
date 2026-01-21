@@ -23,7 +23,7 @@ interface Playlist {
   loadedTracks: number;
   lastUpdate: Date;
   lastChange?: Date;
-  nextUrl: string | null;
+  next: string | null;
   tracks: Track[];
 }
 
@@ -40,7 +40,7 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
 
   isLoading = signal(false);
   likedTracks = signal<Track[]>([]);
-  nextUrl = signal<string | null>(null);
+  next = signal<string | null>(null);
   total = signal(0);
   maxTracks: number = 1500;
 
@@ -64,7 +64,7 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
 
   constructor() {
     this.scrollLoadSubject.pipe(
-      debounceTime(200), // Attend 200ms de silence avant d'exécuter
+      debounceTime(150), // Attend 150ms de silence avant d'exécuter
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => {
       this.executeActualLoad(); // Appelle la logique de chargement
@@ -90,77 +90,84 @@ export class PrimengMusicComponent implements OnInit, OnChanges {
 
   // --- CHARGEMENT DES TITRES LIKÉS ---
   private executeActualLoad() {
-    // On vérifie les conditions de garde
     if (this.isLoading() || (this.total() > 0 && this.loadedTracksCount() >= this.total()) || this.likedTracks().length >= this.maxTracks) {
       return;
     }
 
     this.isLoading.set(true);
     
-    this.spotifyService.getUserLikedTracks(this.nextUrl())
+    this.spotifyService.getUserLikedTracks(this.next())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error('Erreur', err);
           this.isLoading.set(false);
-          return of({ items: [], nextUrl: null, total: 0 });
+          return of({ items: [], next: null, total: 0 });
         }),
-        map(({ items, nextUrl, total }) => {
-          const processedTracks = items?.filter((item: any) => item?.track).map((item: any) => ({
-             id: item.track.id,
-             name: item.track.name,
-             artist: item.track.artists?.[0]?.name || 'Unknown',
-             albumImage: item.track.album?.images?.[0]?.url || '',
-             songUrl: item.track.external_urls?.spotify || '',
-             previewUrl: item.track.preview_url || '',
+        map((res: any) => {
+          const processedTracks = res.items?.filter((item: any) => item?.track).map((item: any) => ({
+            id: item.track.id,
+            name: item.track.name,
+            artist: item.track.artists?.[0]?.name || 'Unknown',
+            albumImage: item.track.album?.images?.[0]?.url || '',
+            songUrl: item.track.external_urls?.spotify || '',
+            previewUrl: item.track.preview_url || '',
           })) || [];
-          return { processedTracks, nextUrl, total };
+
+          return { processedTracks, next: res.next, total: res.total };
         })
       )
-      .subscribe(({ processedTracks, nextUrl, total }) => {
+      .subscribe(({ processedTracks, next, total }) => {
         this.likedTracks.update(current => [...current, ...processedTracks]);
         this.total.set(total);
-        this.nextUrl.set(nextUrl);
+        this.next.set(next);
         this.isLoading.set(false);
       });
-  }
+    }
 
   // --- CHARGEMENT DES TITRES DES PLAYLISTS ---
   loadPlaylistsTracks(playlist: Playlist) {
-    // Garde : on ne charge pas si mis à jour il y a moins de 10s ou si tout est chargé
-    const isRecentlyUpdated = playlist.lastUpdate && (Date.now() - playlist.lastUpdate.getTime() <= 10000);
-    if (isRecentlyUpdated && (!playlist.lastChange || playlist.lastChange < playlist.lastUpdate)) {
+    // 1. Initialisation sécurisée : si tracks est undefined, on le crée
+    if (!playlist.tracks) {
+      playlist.tracks = [];
+    }
+
+    const urlToFetch = playlist.next;
+
+    // 2. Sécurité : on n'arrête que si on a déjà des titres ET qu'il n'y a plus de page suivante
+    if (playlist.tracks.length > 0 && !urlToFetch) {
       return;
     }
 
-    this.spotifyService.getPlaylistTracks(playlist.id, playlist.nextUrl)
+    this.spotifyService.getPlaylistTracks(playlist.id, urlToFetch)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error(`Erreur playlist ${playlist.id}`, err);
           return of({ items: [], next: null, total: 0 });
-        }),
-        map(({ items, next, total }) => {
-          const tracks = items?.filter((item: any) => item?.track).map((item: any) => ({
-            id: item.track.id
-          })) || [];
-          return { tracks, next, total };
         })
       )
-      .subscribe(({ tracks, next, total }) => {
-        playlist.tracks = [...(playlist.tracks || []), ...tracks];
-        playlist.total = total;
-        playlist.nextUrl = next;
+      .subscribe((res: any) => {
+        const newTracks = res.items
+          ?.filter((item: any) => item?.track?.id)
+          .map((item: any) => ({ id: item.track.id })) || [];
+
+        // Mise à jour de l'objet
+        playlist.tracks = [...playlist.tracks, ...newTracks];
+        playlist.total = res.total;
+        playlist.next = res.next;
         playlist.lastUpdate = new Date();
 
-        // On précise que t est de type Track (ou au moins possède une propriété id)
         this.trackMembership.update(currentSet => {
           const newSet = new Set(currentSet);
-          tracks.forEach((t: { id: string }) => newSet.add(`${playlist.id}|${t.id}`));
+          newTracks.forEach((t: any) => newSet.add(`${playlist.id}|${t.id}`));
           return newSet;
         });
 
-        if (next) this.loadPlaylistsTracks(playlist);
+        // 3. Récursion propre
+        if (res.next) {
+          setTimeout(() => this.loadPlaylistsTracks(playlist), 0);
+        }
       });
   }
 
