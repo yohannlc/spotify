@@ -19,12 +19,16 @@ export class WelcomeComponent implements OnInit {
     // 2️⃣ Si retour Spotify avec ?code=
     const code = this.spotifyService.getAuthorizationCodeFromUrl();
     if (code) {
-      await this.spotifyService.handleAuthorizationCode(code);
-      window.history.replaceState({}, document.title, '/');
-      return;
-    }
-
-     // 3️⃣ Sinon → rediriger vers Spotify
-    await this.spotifyService.startLogin();
+      try {
+        await this.spotifyService.handleAuthorizationCode(code);
+        // On nettoie l'URL et on redirige proprement
+        window.location.href = window.location.origin; 
+      } catch (err) {
+        console.error("Échec auth:", err);
+      }
+    } else {
+      // UNIQUEMENT si pas de code ET pas de token
+      await this.spotifyService.startLogin();
+  }
   }
 }

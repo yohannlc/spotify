@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -43,13 +44,19 @@ export class SpotifyService {
       throw new Error('Missing PKCE verifier');
     }
 
-    this.exchangeCodeForToken(code, verifier).subscribe(res => {
-      localStorage.setItem('spotifyAccessToken', res.access_token);
+    try {
+      const res = await lastValueFrom(this.exchangeCodeForToken(code, verifier));
+      localStorage.setItem(this.localStorageAccesToken, res.access_token);
       localStorage.setItem(
-        'spotifyTokenExpiration',
+        this.expirationAccessToken,
         (Date.now() + res.expires_in * 1000).toString()
       );
-    });
+      // Optionnel : nettoyer le verifier après usage
+      localStorage.removeItem('pkce_verifier');
+    } catch (error) {
+      console.error("Erreur lors de l'échange de token", error);
+      throw error;
+    }
   }
 
   // 4️⃣ Échanger le code contre un token
@@ -120,7 +127,7 @@ export class SpotifyService {
     });
 
     return this.http.get(requestUrl ? requestUrl : `https://api.spotify.com/v1/me/playlists`, { headers });
-}
+  }
 
   public getUserLikedTracks(requestUrl: string | null): Observable<any> {
     const headers = new HttpHeaders({
